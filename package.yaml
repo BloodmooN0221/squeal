@@ -24,6 +24,7 @@ dependencies:
 - bytestring
 - http-client
 - http-client-tls
+- case-insensitive
 
 library:
   source-dirs: src

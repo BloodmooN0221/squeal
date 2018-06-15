@@ -1,0 +1,2 @@
+#!/bin/bash
+stack ghci --no-bench --no-test
