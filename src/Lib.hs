@@ -1,8 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Lib
-    ( someFunc
-    ) where
+module Lib ( callService ) where
 
 import Network.HTTP.Client (httpLbs, newManager, parseRequest, responseBody, requestHeaders)
 import Network.HTTP.Client.TLS (tlsManagerSettings)
@@ -10,6 +8,7 @@ import qualified Data.ByteString.Lazy.Char8 as L8
 import Data.CaseInsensitive (CI)
 import qualified Data.ByteString as B
 import qualified Data.Text as T
+import qualified Data.Monoid as M
 import Data.Aeson (decode, FromJSON)
 import Types
 import SquealJson
@@ -25,17 +24,7 @@ callService (PasswordHash hash) = pure Nothing
 getBreaches :: Email -> IO (L8.ByteString)
 getBreaches (Email email) =
   do manager  <- newManager tlsManagerSettings
-     r1       <- parseRequest $ "https://haveibeenpwned.com/api/v2/breachedaccount/" ++ (T.unpack email)
+     r1       <- parseRequest $ "https://haveibeenpwned.com/api/v2/breachedaccount/" M.<> (T.unpack email)
      let request = r1 { requestHeaders = [userAgent]}
      response <- httpLbs request manager
      return (responseBody response)
-
-someFunc :: IO ()
-someFunc = do manager  <- newManager tlsManagerSettings
-              r1      <- parseRequest "https://haveibeenpwned.com/api/v2/breachedaccount/sanjsmailbox@gmail.com"
-              let request = r1 { requestHeaders = [userAgent]}
-              response <- httpLbs request manager
-              let response2 = responseBody response
-                  breachedAccounts = decode response2 :: Maybe BreachedAccounts
-                  result = maybe (T.pack "No breaches") (T.intercalate (T.pack ",") . fmap name . accounts) breachedAccounts
-              print result
