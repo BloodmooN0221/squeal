@@ -12,7 +12,6 @@ import qualified Data.Text as T
 import qualified Data.Monoid as M
 import Data.Aeson (decode, FromJSON)
 import Types
-import SquealJson
 
 userAgent :: (CI B.ByteString, B.ByteString)
 userAgent = ("User-Agent", "squeal")

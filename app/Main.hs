@@ -4,6 +4,7 @@ import qualified Data.Text as T
 import Types
 import Printer
 import Lib (callBreachesService)
+import SquealJson
 
 main :: IO ()
 main = do accounts <- callBreachesService (Breach $ Email $ T.pack "sanjsmailbox@gmail.com") :: IO (Maybe BreachedAccounts)
