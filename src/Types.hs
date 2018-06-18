@@ -17,4 +17,4 @@ data Service = Breach Email | PasswordHash Hash
 
 data Email = Email T.Text
 
-data Hash = Hash T.Text
+data Hash = Hash { prefix :: !T.Text, suffix :: !T.Text }
