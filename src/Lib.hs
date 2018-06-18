@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Lib ( callService ) where
+module Lib ( callBreachesService ) where
 
 import Network.HTTP.Client (httpLbs, newManager, parseRequest, queryString, responseBody, requestHeaders)
 import Network.HTTP.Client.TLS (tlsManagerSettings)
@@ -20,9 +20,12 @@ userAgent = ("User-Agent", "squeal")
 truncateResponse :: B.ByteString
 truncateResponse = C8.pack "truncateResponse=true"
 
-callService :: FromJSON a => Service -> IO (Maybe a)
-callService (Breach email) = decode <$> (getBreaches email)
-callService (PasswordHash hash) = pure Nothing
+-- callService :: FromJSON a => Service -> IO (Maybe a)
+-- callService (Breach email) = decode <$> (getBreaches email)
+-- callService (PasswordHash hash) = pure Nothing
+
+callBreachesService :: FromJSON a => Breach -> IO (Maybe a)
+callBreachesService (Breach email) = decode <$> (getBreaches email)
 
 getBreaches :: Email -> IO (L8.ByteString)
 getBreaches (Email email) =

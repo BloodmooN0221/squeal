@@ -1,6 +1,7 @@
 module Types (BreachedAccounts(..),
               BreachedAccount(..),
-              Service(..),
+              Breach(..),
+              PasswordHash(..),
               Hash(..),
               Email(..)
               ) where
@@ -13,7 +14,9 @@ data BreachedAccount =
 data BreachedAccounts =
   BreachedAccounts { accounts :: [BreachedAccount] } deriving Show
 
-data Service = Breach Email | PasswordHash Hash
+-- data Service = Breach Email | PasswordHash Hash
+data Breach = Breach Email
+data PasswordHash = PasswordHash Hash
 
 data Email = Email T.Text
 
