@@ -27,6 +27,7 @@ dependencies:
 - http-client-tls
 - case-insensitive
 - aeson
+- cryptohash
 
 library:
   source-dirs: src

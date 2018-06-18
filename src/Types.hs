@@ -1,7 +1,5 @@
 module Types (BreachedAccounts(..),
               BreachedAccount(..),
-              Email,
-              Hash,
               Service(..),
               Hash(..),
               Email(..)
