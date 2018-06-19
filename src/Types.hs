@@ -18,12 +18,12 @@ data BreachedAccounts =
   BreachedAccounts { accounts :: [BreachedAccount] } deriving Show
 
 -- data Service = Breach Email | PasswordHash Hash
-data Breach = Breach Email
-data PasswordHash = PasswordHash Hash
+data Breach = Breach Email deriving Show
+data PasswordHash = PasswordHash Hash deriving Show
 
-data Email = Email T.Text
+data Email = Email T.Text deriving Show
 
-data Hash = Hash { prefix :: !B.ByteString, suffix :: !B.ByteString }
+data Hash = Hash { prefix :: !B.ByteString, suffix :: !B.ByteString } deriving Show
 
 instance FromJSON BreachedAccount where
   parseJSON (Object v)  = BreachedAccount <$> v .: (T.pack "Name")
