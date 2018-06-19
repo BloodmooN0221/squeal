@@ -7,3 +7,6 @@ import Types (BreachedAccounts(..), name)
 printBreaches :: BreachedAccounts -> T.Text
 printBreaches (BreachedAccounts []) = T.pack "No Breached Accounts"
 printBreaches (BreachedAccounts xs) = (T.pack "Breached Accounts:\n" <>) . T.intercalate (T.pack "\n") . fmap ((T.pack " - " <>) . name) $ xs
+
+printPasswordHash :: Bool -> T.Text
+printPasswordHash = T.pack . ("Password stolen: " <>) . show

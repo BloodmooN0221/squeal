@@ -1,0 +1,2 @@
+#!/bin/bash
+stack test --no-run-tests --haddock-deps --fast && run

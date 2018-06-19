@@ -27,10 +27,14 @@ dependencies:
 - http-client-tls
 - case-insensitive
 - aeson
-- cryptohash
+- cryptonite
 
 library:
   source-dirs: src
+  ghc-options:
+  - -Wall
+  - -Wincomplete-uni-patterns
+  - -Wincomplete-record-updates
 
 executables:
   squeal-exe:
@@ -40,6 +44,9 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -Wall
+    - -Wincomplete-uni-patterns
+    - -Wincomplete-record-updates
     dependencies:
     - squeal
 
@@ -51,5 +58,8 @@ tests:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -Wall
+    - -Wincomplete-uni-patterns
+    - -Wincomplete-record-updates
     dependencies:
     - squeal
