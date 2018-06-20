@@ -11,8 +11,8 @@ listBreaches (BreachedAccounts xs) = (T.pack "Breached Accounts:\n" <>) . T.inte
 printPasswordHash :: Bool -> T.Text
 printPasswordHash = T.pack . ("Password stolen: " <>) . show
 
-usage :: String
-usage = "usage: squeal -e <email_address> | -p <password>"
+usage :: T.Text
+usage = T.pack "usage: squeal -e <email_address> | -p <password>"
 
 couldNotFindBreachedAccounts :: T.Text
 couldNotFindBreachedAccounts = T.pack "Could not find breached accounts"
