@@ -19,10 +19,6 @@ userAgent = ("User-Agent", "squeal")
 truncateResponse :: B.ByteString
 truncateResponse = C8.pack "truncateResponse=true"
 
--- callService :: FromJSON a => Service -> IO (Maybe a)
--- callService (Breach email) = decode <$> (getBreaches email)
--- callService (PasswordHash hash) = pure Nothing
-
 callBreachesService :: FromJSON a => Breach -> IO (Maybe a)
 callBreachesService (Breach email) = decode <$> (getBreaches email)
 
