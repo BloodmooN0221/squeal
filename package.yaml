@@ -38,7 +38,7 @@ library:
   - -Wincomplete-record-updates
 
 executables:
-  squeal-exe:
+  squeal:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
