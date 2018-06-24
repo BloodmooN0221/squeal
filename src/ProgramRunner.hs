@@ -20,8 +20,8 @@ handleErrors EmptyPassword             = pure $ printf "Empty password supplied.
 
 runCommand :: Command -> IO String
 runCommand (LookUpBreachSites breach)        =
-  do maybeAccounts <- callBreachesService breach
-     pure $ T.unpack $ maybe couldNotFindBreachedAccounts listBreaches maybeAccounts
+  do accountsE <- callBreachesService breach
+     pure $ either breachErrorToString listBreaches accountsE
 
 runCommand (LookupPasswordHash passwordHash) =
   do passResult <- callPasswordHashService passwordHash

@@ -25,6 +25,7 @@ dependencies:
 - text
 - http-client
 - http-client-tls
+- http-types
 - case-insensitive
 - aeson
 - cryptonite

@@ -1,12 +1,14 @@
 module Printer where
 
 import qualified Data.Text as T
+import Data.List (intercalate)
 import Data.Monoid
-import Types (BreachedAccounts(..), name)
+import Text.Printf (printf)
+import Types (BreachedAccounts(..), BreachError(..), name)
 
-listBreaches :: BreachedAccounts -> T.Text
-listBreaches (BreachedAccounts []) = T.pack "No Breached Accounts"
-listBreaches (BreachedAccounts xs) = (T.pack "Breached Accounts:\n" <>) . T.intercalate (T.pack "\n") . fmap ((T.pack " - " <>) . name) $ xs
+listBreaches :: BreachedAccounts -> String
+listBreaches (BreachedAccounts []) = "No Breached Accounts"
+listBreaches (BreachedAccounts xs) = ("Breached Accounts:\n" <>) . intercalate ("\n") . fmap ((" - " <>) . T.unpack . name) $ xs
 
 printPasswordHash :: Bool -> T.Text
 printPasswordHash = T.pack . ("Password stolen: " <>) . show
@@ -14,6 +16,13 @@ printPasswordHash = T.pack . ("Password stolen: " <>) . show
 usage :: T.Text
 usage = T.pack "usage: squeal -e <email_address> | -p <password>"
 
-couldNotFindBreachedAccounts :: T.Text
-couldNotFindBreachedAccounts = T.pack "Could not find breached accounts"
+couldNotFindBreachedAccounts :: String
+couldNotFindBreachedAccounts = "Could not find breached accounts"
+
+breachErrorToString :: BreachError -> String
+breachErrorToString (ApiCallError httpError)          = printf "http error when calling the api: %s" (show httpError)
+breachErrorToString (InvalidUrl url reason)           = printf "invalid url: %s due to: %s" (show url) reason
+breachErrorToString (InvalidContext req context)      = printf "invalid invocation, req: %s, context: %s" (show req) (show context)
+breachErrorToString (InvalidResponse decodeError res) = printf "breaches decode error: %s with response: %s" (show decodeError) (show res)
+
 

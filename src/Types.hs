@@ -3,7 +3,14 @@ module Types (BreachedAccounts(..),
               Breach(..),
               PasswordHash(..),
               Hash(..),
-              Email(..)
+              Email(..),
+              HttpError(..),
+              BreachError(..),
+              Url(..),
+              RequestString(..),
+              ResponseString(..),
+              ContextString(..),
+              DecodeError(..)
               ) where
 
 import qualified Data.Text as T
@@ -24,6 +31,20 @@ data PasswordHash = PasswordHash Hash deriving Show
 data Email = Email T.Text deriving Show
 
 data Hash = Hash { prefix :: !B.ByteString, suffix :: !B.ByteString } deriving Show
+
+data HttpError = BadRequest String | Forbidden String | NotFound String | TooManyRequests String | OtherError Int !B.ByteString deriving Show
+
+data Url = Url String deriving Show
+
+data RequestString = RequestString String deriving Show
+
+data ResponseString = ResponseString String deriving Show
+
+data ContextString = ContextString String deriving Show
+
+data DecodeError = DecodeError String deriving Show
+
+data BreachError = ApiCallError HttpError | InvalidUrl Url String | InvalidContext RequestString ContextString | InvalidResponse DecodeError ResponseString
 
 instance FromJSON BreachedAccount where
   parseJSON (Object v)  = BreachedAccount <$> v .: (T.pack "Name")
