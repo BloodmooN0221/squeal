@@ -29,13 +29,18 @@ callBreachesService (Breach email) =
 stringToBreachError :: L8.ByteString -> Either String a -> Either BreachError a
 stringToBreachError response = either (\e -> Left $ InvalidResponse (DecodeError e) (ResponseString $ L8.unpack response)) Right
 
-callPasswordHashService :: PasswordHash -> IO Bool
+callPasswordHashService :: PasswordHash -> IO (Either PasswordHashError Bool)
 callPasswordHashService (PasswordHash hash) =
-  do content <- L8.toStrict <$> getPasswordHashes hash
-     let hashedLines = C8.split '\n' content
-     let onlyHashes  = C8.takeWhile (/= ':') <$> hashedLines
-     let hashSuffix  = suffix hash
-     return $ any (== hashSuffix) onlyHashes
+  do contentE <- getPasswordHashes hash
+     return (processContent <$> contentE)
+     where
+       processContent :: L8.ByteString -> Bool
+       processContent contentL8 =
+        let content     = L8.toStrict contentL8
+            hashedLines = C8.split '\n' content
+            onlyHashes  = C8.takeWhile (/= ':') <$> hashedLines
+            hashSuffix  = suffix hash
+         in any (== hashSuffix) onlyHashes
 
 getBreaches :: Email -> IO (Either BreachError L8.ByteString)
 getBreaches (Email email) =
@@ -45,11 +50,6 @@ getBreaches (Email email) =
      responseE <- tryJust handleBreachesError $ httpLbs request manager
      return (responseBody <$> responseE)
 
-handleBreachesError :: HttpException -> Maybe BreachError
-handleBreachesError (HttpExceptionRequest _ (StatusCodeException response _)) = Just $ ApiCallError $ statusCodeToHttpError $ responseStatus response
-handleBreachesError (HttpExceptionRequest req context) = Just $ InvalidContext (RequestString $ show req) (ContextString $ show context)
-handleBreachesError (InvalidUrlException url reason)   = Just $ InvalidUrl (Url url) reason
-
 statusCodeToHttpError :: Status -> HttpError
 statusCodeToHttpError status
   | status == badRequest400      = BadRequest "The account does not comply with an acceptable format (i.e. it's an empty string)"
@@ -58,10 +58,24 @@ statusCodeToHttpError status
   | status == tooManyRequests429 = TooManyRequests "Too many requests — the rate limit has been exceeded"
   | otherwise                    = OtherError (statusCode status) (statusMessage status)
 
-getPasswordHashes :: Hash -> IO (L8.ByteString)
+getPasswordHashes :: Hash -> IO (Either PasswordHashError L8.ByteString)
 getPasswordHashes (Hash hashPrefix _) =
   do manager  <- newManager tlsManagerSettings
-     r1       <- parseRequest $ "https://api.pwnedpasswords.com/range/" M.<> (C8.unpack hashPrefix)
+     r1       <- parseUrlThrow $ "https://api.pwnedpasswords.com/range/" M.<> (C8.unpack hashPrefix)
      let request = r1 { requestHeaders = [userAgent]}
-     response <- httpLbs request manager
-     return (responseBody response)
+     responseE <- tryJust handlePasswordHashError $ httpLbs request manager
+     return (responseBody <$> responseE)
+
+
+-- TODO: Remove this duplication
+handleBreachesError :: HttpException -> Maybe BreachError
+handleBreachesError (HttpExceptionRequest _ (StatusCodeException response _)) = Just $ BreachApiError $ ApiCallError $ statusCodeToHttpError $ responseStatus response
+handleBreachesError (HttpExceptionRequest req context) = Just $ BreachApiError $ InvalidContext (RequestString $ show req) (ContextString $ show context)
+handleBreachesError (InvalidUrlException url reason)   = Just $ BreachApiError $ InvalidUrl (Url url) reason
+
+-- TODO: Remove this duplication
+handlePasswordHashError :: HttpException -> Maybe PasswordHashError
+handlePasswordHashError (HttpExceptionRequest _ (StatusCodeException response _)) = Just $ PasswordHashApiError $ ApiCallError $ statusCodeToHttpError $ responseStatus response
+handlePasswordHashError (HttpExceptionRequest req context) = Just $ PasswordHashApiError $ InvalidContext (RequestString $ show req) (ContextString $ show context)
+handlePasswordHashError (InvalidUrlException url reason)   = Just $ PasswordHashApiError $ InvalidUrl (Url url) reason
+

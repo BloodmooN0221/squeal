@@ -6,6 +6,8 @@ module Types (BreachedAccounts(..),
               Email(..),
               HttpError(..),
               BreachError(..),
+              PasswordHashError(..),
+              EndpointCallError(..),
               Url(..),
               RequestString(..),
               ResponseString(..),
@@ -44,7 +46,11 @@ data ContextString = ContextString String deriving Show
 
 data DecodeError = DecodeError String deriving Show
 
-data BreachError = ApiCallError HttpError | InvalidUrl Url String | InvalidContext RequestString ContextString | InvalidResponse DecodeError ResponseString
+data EndpointCallError = ApiCallError HttpError | InvalidUrl Url String | InvalidContext RequestString ContextString deriving Show
+
+data BreachError = BreachApiError EndpointCallError | InvalidResponse DecodeError ResponseString deriving Show
+
+data PasswordHashError = PasswordHashApiError EndpointCallError deriving Show
 
 instance FromJSON BreachedAccount where
   parseJSON (Object v)  = BreachedAccount <$> v .: (T.pack "Name")

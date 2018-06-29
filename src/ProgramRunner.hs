@@ -7,6 +7,7 @@ import Lib (callBreachesService, callPasswordHashService)
 import ProgramArgs
 import Text.Printf (printf)
 import Data.List (intercalate)
+import Types (Breach(..))
 
 process :: [String] -> IO String
 process args = do let commands = getCommand args
@@ -21,8 +22,10 @@ handleErrors EmptyPassword             = pure $ printf "Empty password supplied.
 runCommand :: Command -> IO String
 runCommand (LookUpBreachSites breach)        =
   do accountsE <- callBreachesService breach
-     pure $ either breachErrorToString listBreaches accountsE
+     let (Breach email) = breach
+     pure $ either breachErrorToString (listBreaches email) accountsE
 
 runCommand (LookupPasswordHash passwordHash) =
-  do passResult <- callPasswordHashService passwordHash
-     (pure . T.unpack . printPasswordHash) passResult
+  do passResultE <- callPasswordHashService passwordHash
+     pure $ either passwordHashErrorToString (T.unpack . printPasswordHashStolen) passResultE
+
