@@ -14,6 +14,7 @@ import qualified Data.Text as T
 import qualified Data.Monoid as M
 import Data.Aeson (eitherDecode, FromJSON)
 import Types
+import Text.Printf (printf)
 
 userAgent :: (CI B.ByteString, B.ByteString)
 userAgent = ("User-Agent", "squeal")
@@ -55,7 +56,7 @@ statusCodeToHttpError status
   | status == badRequest400      = BadRequest "The account does not comply with an acceptable format (i.e. it's an empty string)"
   | status == forbidden403       = Forbidden "No user agent has been specified in the request"
   | status == notFound404        = NotFound "Not found — the account could not be found and has therefore not been pwned"
-  | status == tooManyRequests429 = TooManyRequests "Too many requests — the rate limit has been exceeded"
+  | status == tooManyRequests429 = TooManyRequests $ printf "Too many requests — the rate limit has been exceeded:%s" (C8.unpack $ statusMessage status)
   | otherwise                    = OtherError (statusCode status) (statusMessage status)
 
 getPasswordHashes :: Hash -> IO (Either PasswordHashError L8.ByteString)
