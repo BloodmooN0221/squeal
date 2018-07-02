@@ -22,7 +22,7 @@ printPasswordHashStolen :: Bool -> T.Text
 printPasswordHashStolen = T.pack . ("Password stolen: " <>) . show
 
 usage :: T.Text
-usage = T.pack "usage: squeal -e <email_address> | -p <password>"
+usage = T.pack "usage: squeal -e <email_address> | -p <password> | -ef <email_address_file>"
 
 couldNotFindBreachedAccounts :: String
 couldNotFindBreachedAccounts = "Could not find breached accounts"

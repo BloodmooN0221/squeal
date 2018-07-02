@@ -7,7 +7,7 @@ A Haskell command line wrapper around [haveibeenpwned](https://haveibeenpwned.co
 ## Usage
 
 ```
-squeal -e <email_address> | -p <password>
+squeal -e <email_address> | -p <password> | -ef <email_address_file>
 ```
 
 To list breaches for an email address use:
@@ -23,6 +23,12 @@ Breached Accounts:
  - Site1
  - Site2
  - Site3
+```
+
+To use a file with multiple emails (each on separate lines) use:
+
+```
+squeal -ef your-email-file
 ```
 
 To verify a password has not been pwned use:

@@ -1,4 +1,4 @@
-module ProgramArgs (getCommand, CommandError(..), Command(..)) where
+module ProgramArgs (getCommand, CommandError(..), Command(..), FileReadError(..), emailTextValidation) where
 
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as C8
@@ -6,19 +6,25 @@ import qualified Data.Text as T
 import Types
 import Hasher (sha1)
 
-data Command = LookUpBreachSites Breach | LookupPasswordHash PasswordHash deriving Show
+data Command = LookUpBreachSites Breach
+             | LookUpBreachesFromFile String
+             | LookupPasswordHash PasswordHash deriving Show
 
 data CommandError = NoCommandsSupplied
                   | UnknownCommand [String]
                   | InvalidEmail
+                  | InvalidEmailFile FileReadError
                   | EmptyPassword
                   deriving Show
 
+data FileReadError = FileReadError String deriving Show
+
 getCommand :: [String] -> Either CommandError Command
 getCommand [] = Left NoCommandsSupplied
-getCommand ("-e" : email : [])    =
+getCommand ("-e" : email : [])     =
   boolToEither (emailValidation email) InvalidEmail (LookUpBreachSites $ parseBreach email)
-getCommand ("-p" : password : []) =
+getCommand ("-ef" : fileName : []) = Right $ LookUpBreachesFromFile fileName
+getCommand ("-p" : password : [])  =
   boolToEither (passwordValidation password) EmptyPassword (LookupPasswordHash $ parsePasswordHash password)
 getCommand other = Left $ UnknownCommand other
 
@@ -33,6 +39,9 @@ parsePasswordHash password = let hashed = sha1 (C8.pack password)
 emailValidation :: String -> Bool
 emailValidation []    = False
 emailValidation email = length email > 5 &&  any (== '@') email && any (== '.') email
+
+emailTextValidation :: T.Text -> Bool
+emailTextValidation email = T.length email > 5 &&  T.any (== '@') email && T.any (== '.') email
 
 passwordValidation :: String -> Bool
 passwordValidation [] = False
