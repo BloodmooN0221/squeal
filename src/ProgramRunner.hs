@@ -30,7 +30,7 @@ runCommand (LookUpBreachSites breach)        =
 
 runCommand (LookupPasswordHash passwordHash) =
   do passResultE <- callPasswordHashService passwordHash
-     pure $ either passwordHashErrorToString (T.unpack . printPasswordHashStolen) passResultE
+     pure $ either handlePasswordHashErrors printPasswordHashStolen passResultE
 
 runCommand (LookUpBreachesFromFile fileName) =
   do emailsE <- readEmailFromFile fileName
