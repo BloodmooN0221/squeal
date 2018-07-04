@@ -9,14 +9,19 @@ import Types (BreachedAccount)
 import Types (BreachError(..))
 import Types (Email(..))
 import Types (EndpointCallError(..))
+import Types (HttpError(..))
 import Types (PasswordHashError(..))
 import Types (name)
 
 listBreaches :: Email -> BreachedAccounts -> String
-listBreaches (Email email) (BreachedAccounts []) = printf "No Breached Accounts for %s" (T.unpack email)
+listBreaches (Email email) (BreachedAccounts []) = printf "No Breached Accounts for: %s" (T.unpack email)
 listBreaches (Email email) (BreachedAccounts xs) = printf "Breached Accounts for %s:\n%s" (T.unpack email) (bulleted xs)
   where bulleted :: [BreachedAccount] -> String
         bulleted = intercalate ("\n") . fmap ((" - " <>) . T.unpack . name)
+
+handleBreachErrors :: Email -> BreachError -> String
+handleBreachErrors email (BreachApiError (ApiCallError (NotFound _))) = listBreaches email (BreachedAccounts [])
+handleBreachErrors _ otherError = breachErrorToString otherError
 
 printPasswordHashStolen :: Bool -> T.Text
 printPasswordHashStolen = T.pack . ("Password stolen: " <>) . show

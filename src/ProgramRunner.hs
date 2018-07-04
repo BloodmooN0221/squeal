@@ -22,12 +22,11 @@ handleErrors InvalidEmail                = pure $ printf "Invalid email supplied
 handleErrors EmptyPassword               = pure $ printf "Empty password supplied.\n%s" usage
 handleErrors (InvalidEmailFile (FileReadError reason)) = pure $ printf "Could not read file:%s" reason
 
-
 runCommand :: Command -> IO String
 runCommand (LookUpBreachSites breach)        =
   do accountsE <- callBreachesService breach
      let (Breach email) = breach
-     pure $ either breachErrorToString (listBreaches email) accountsE
+     pure $ either (handleBreachErrors email) (listBreaches email) accountsE
 
 runCommand (LookupPasswordHash passwordHash) =
   do passResultE <- callPasswordHashService passwordHash
@@ -48,4 +47,3 @@ readEmailFromFile fileName = do contentsE <- tryJust handleFileErrors (readFile 
 
 handleFileErrors :: IOException -> Maybe FileReadError
 handleFileErrors = Just . FileReadError . show
-
