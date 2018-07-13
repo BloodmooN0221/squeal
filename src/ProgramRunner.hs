@@ -7,7 +7,7 @@ import Lib (callBreachesService, callPasswordHashService)
 import ProgramArgs
 import Text.Printf (printf)
 import Data.List (intercalate)
-import Types (Breach(..), Email(..))
+import Types (Breach(..), Email(..), BreachErrorWithEmail(..))
 import Control.Exception (IOException, tryJust)
 import Control.Applicative (liftA)
 
@@ -32,11 +32,27 @@ runCommand (LookupPasswordHash passwordHash) =
   do passResultE <- callPasswordHashService passwordHash
      pure $ either handlePasswordHashErrors printPasswordHashStolen passResultE
 
+-- runCommand (LookUpBreachesFromFile fileName) =
+--   do emailsE <- readEmailFromFile fileName
+--      let breachLooksE = liftA (LookUpBreachSites . Breach <$>) emailsE
+--          results = either ((\x -> [x]) . pure . show) ( ((++ "\n") <$>) . runCommand <$>) breachLooksE
+--      mconcat results
+
 runCommand (LookUpBreachesFromFile fileName) =
   do emailsE <- readEmailFromFile fileName
-     let breachLooksE = liftA (LookUpBreachSites . Breach <$>) emailsE
-         results = either ((\x -> [x]) . pure . show) ( ((++ "\n") <$>) . runCommand <$>) breachLooksE
-     mconcat results
+     either (pure . show) runBatchEmailLookup emailsE
+
+runEmail :: Email -> IO (Either BreachErrorWithEmail String)
+runEmail email = do accountsE <- callBreachesService $ Breach email
+                    pure $ either (\be -> Left $ BreachErrorWithEmail be email) (\ba -> Right $ listBreaches email ba) accountsE
+
+runBatchEmailLookup :: [Email] -> IO String
+runBatchEmailLookup emails = let listOfResults = runAllEmails emails
+                                 resultsIOE = (sequence <$>) $ sequence listOfResults -- IO (Either BreachErrorWithEmail [String])
+                              in (either (\(BreachErrorWithEmail e email) -> handleBreachErrors email e) (intercalate "\n")) <$> resultsIOE
+                              where runAllEmails :: [Email] -> [IO (Either BreachErrorWithEmail String)]
+                                    runAllEmails = (runEmail <$>)
+
 
 readEmailFromFile :: String -> IO (Either FileReadError [Email])
 readEmailFromFile fileName = do contentsE <- tryJust handleFileErrors (readFile fileName)

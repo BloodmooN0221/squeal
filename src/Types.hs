@@ -6,6 +6,7 @@ module Types (BreachedAccounts(..),
               Email(..),
               HttpError(..),
               BreachError(..),
+              BreachErrorWithEmail(..),
               PasswordHashError(..),
               EndpointCallError(..),
               Url(..),
@@ -49,6 +50,8 @@ data DecodeError = DecodeError String deriving Show
 data EndpointCallError = ApiCallError HttpError | InvalidUrl Url String | InvalidContext RequestString ContextString deriving Show
 
 data BreachError = BreachApiError EndpointCallError | InvalidResponse DecodeError ResponseString deriving Show
+
+data BreachErrorWithEmail = BreachErrorWithEmail BreachError Email
 
 data PasswordHashError = PasswordHashApiError EndpointCallError deriving Show
 
