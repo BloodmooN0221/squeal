@@ -10,6 +10,7 @@ import Data.List (intercalate)
 import Types (Breach(..), Email(..), BreachErrorWithEmail(..))
 import Control.Exception (IOException, tryJust)
 import Control.Applicative (liftA)
+import Control.Concurrent (threadDelay)
 
 process :: [String] -> IO String
 process args = do let commands = getCommand args
@@ -40,19 +41,27 @@ runEmail :: Email -> IO (Either BreachErrorWithEmail String)
 runEmail email = do accountsE <- callBreachesService $ Breach email
                     pure $ either (\be -> Left $ BreachErrorWithEmail be email) (\ba -> Right $ listBreaches email ba) accountsE
 
+-- TODO: May have to use tailRecM here
 runBatchEmailLookup2 :: [Email] -> IO String
 runBatchEmailLookup2 [] = pure "done"
 runBatchEmailLookup2 (email:rest) =
   do emailResultE <- runEmail email
-     either (pure . printf "\nerror running email %s due to: %s" (show email) .  show) (\result -> (result ++) <$> runBatchEmailLookup2 rest) emailResultE
+     either (\(BreachErrorWithEmail be em) -> pure $ handleBreachErrors em be)
+            (\result -> do _ <- putStrLn result
+                           _ <- putStrLn $ printf "waiting for %d seconds" (getSeconds delay)
+                           _ <- threadDelay $ (getMicro . secondsToMicro) delay
+                           runBatchEmailLookup2 rest
+            ) emailResultE
 
-runBatchEmailLookup :: [Email] -> IO String
-runBatchEmailLookup emails = let listOfResults = runAllEmails emails
-                                 resultsIOE = (sequence <$>) $ sequence listOfResults -- IO (Either BreachErrorWithEmail [String])
-                              in (either (\(BreachErrorWithEmail e email) -> handleBreachErrors email e) (intercalate "\n")) <$> resultsIOE
-                              where runAllEmails :: [Email] -> [IO (Either BreachErrorWithEmail String)]
-                                    runAllEmails = (runEmail <$>)
+newtype Seconds = Seconds { getSeconds :: Int } deriving Show
 
+newtype MicroSeconds = MicroSeconds { getMicro :: Int }
+
+delay :: Seconds
+delay = Seconds 2
+
+secondsToMicro :: Seconds -> MicroSeconds
+secondsToMicro seconds = MicroSeconds $ (getSeconds seconds) * 1000000
 
 readEmailFromFile :: String -> IO (Either FileReadError [Email])
 readEmailFromFile fileName = do contentsE <- tryJust handleFileErrors (readFile fileName)
