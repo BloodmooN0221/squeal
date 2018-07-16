@@ -51,7 +51,7 @@ data EndpointCallError = ApiCallError HttpError | InvalidUrl Url String | Invali
 
 data BreachError = BreachApiError EndpointCallError | InvalidResponse DecodeError ResponseString deriving Show
 
-data BreachErrorWithEmail = BreachErrorWithEmail BreachError Email
+data BreachErrorWithEmail = BreachErrorWithEmail BreachError Email deriving Show
 
 data PasswordHashError = PasswordHashApiError EndpointCallError deriving Show
 

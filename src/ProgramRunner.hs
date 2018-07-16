@@ -32,19 +32,19 @@ runCommand (LookupPasswordHash passwordHash) =
   do passResultE <- callPasswordHashService passwordHash
      pure $ either handlePasswordHashErrors printPasswordHashStolen passResultE
 
--- runCommand (LookUpBreachesFromFile fileName) =
---   do emailsE <- readEmailFromFile fileName
---      let breachLooksE = liftA (LookUpBreachSites . Breach <$>) emailsE
---          results = either ((\x -> [x]) . pure . show) ( ((++ "\n") <$>) . runCommand <$>) breachLooksE
---      mconcat results
-
 runCommand (LookUpBreachesFromFile fileName) =
   do emailsE <- readEmailFromFile fileName
-     either (pure . show) runBatchEmailLookup emailsE
+     either (pure . show) runBatchEmailLookup2 emailsE
 
 runEmail :: Email -> IO (Either BreachErrorWithEmail String)
 runEmail email = do accountsE <- callBreachesService $ Breach email
                     pure $ either (\be -> Left $ BreachErrorWithEmail be email) (\ba -> Right $ listBreaches email ba) accountsE
+
+runBatchEmailLookup2 :: [Email] -> IO String
+runBatchEmailLookup2 [] = pure "done"
+runBatchEmailLookup2 (email:rest) =
+  do emailResultE <- runEmail email
+     either (pure . printf "\nerror running email %s due to: %s" (show email) .  show) (\result -> (result ++) <$> runBatchEmailLookup2 rest) emailResultE
 
 runBatchEmailLookup :: [Email] -> IO String
 runBatchEmailLookup emails = let listOfResults = runAllEmails emails
