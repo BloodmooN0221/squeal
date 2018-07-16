@@ -78,13 +78,11 @@ getPasswordHashes (Hash hashPrefix _) =
      return (responseBody <$> responseE)
 
 
--- TODO: Remove this duplication
 handleBreachesError :: HttpException -> Maybe BreachError
 handleBreachesError (HttpExceptionRequest _ (StatusCodeException response _)) = Just $ BreachApiError $ ApiCallError $ statusCodeToHttpError response
 handleBreachesError (HttpExceptionRequest req context) = Just $ BreachApiError $ InvalidContext (RequestString $ show req) (ContextString $ show context)
 handleBreachesError (InvalidUrlException url reason)   = Just $ BreachApiError $ InvalidUrl (Url url) reason
 
--- TODO: Remove this duplication
 handlePasswordHashError :: HttpException -> Maybe PasswordHashError
 handlePasswordHashError (HttpExceptionRequest _ (StatusCodeException response _)) = Just $ PasswordHashApiError $ ApiCallError $ statusCodeToHttpError response
 handlePasswordHashError (HttpExceptionRequest req context) = Just $ PasswordHashApiError $ InvalidContext (RequestString $ show req) (ContextString $ show context)

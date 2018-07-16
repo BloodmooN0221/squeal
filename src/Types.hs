@@ -31,7 +31,7 @@ data BreachedAccounts =
 data Breach = Breach Email deriving Show
 data PasswordHash = PasswordHash Hash deriving Show
 
-data Email = Email T.Text deriving Show
+data Email = Email { getEmail :: T.Text } deriving Show
 
 data Hash = Hash { prefix :: !B.ByteString, suffix :: !B.ByteString } deriving Show
 

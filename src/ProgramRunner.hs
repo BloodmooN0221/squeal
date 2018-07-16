@@ -7,7 +7,7 @@ import Lib (callBreachesService, callPasswordHashService)
 import ProgramArgs
 import Text.Printf (printf)
 import Data.List (intercalate)
-import Types (Breach(..), Email(..), BreachErrorWithEmail(..))
+import Types
 import Control.Exception (IOException, tryJust)
 import Control.Applicative (liftA)
 import Control.Concurrent (threadDelay)
@@ -42,20 +42,29 @@ runEmail email = do accountsE <- callBreachesService $ Breach email
                     pure $ either (\be -> Left $ BreachErrorWithEmail be email) (\ba -> Right $ listBreaches email ba) accountsE
 
 -- TODO: May have to use tailRecM here
+-- TODO: Move printing functions to Printer
 runBatchEmailLookup2 :: [Email] -> IO String
 runBatchEmailLookup2 [] = pure "done"
 runBatchEmailLookup2 (email:rest) =
-  do emailResultE <- runEmail email
-     either (\(BreachErrorWithEmail be em) -> pure $ handleBreachErrors em be)
+  do _ <- putStrLn $ printf "Looking up email: %s" (getEmail email)
+     emailResultE <- runEmail email
+     either handleBreachError2
             (\result -> do _ <- putStrLn result
-                           _ <- putStrLn $ printf "waiting for %d seconds" (getSeconds delay)
-                           _ <- threadDelay $ (getMicro . secondsToMicro) delay
+                           _ <- waitTos
                            runBatchEmailLookup2 rest
             ) emailResultE
+    where handleBreachError2 :: BreachErrorWithEmail -> IO String
+          handleBreachError2 (BreachErrorWithEmail (BreachApiError (ApiCallError (NotFound _))) (Email em)) = (putStrLn $ printf "No breaches for email: %s" em) >> waitTos >> (runBatchEmailLookup2 rest)
+          handleBreachError2 (BreachErrorWithEmail otherError (Email em)) = pure $ printf "error retrieving email: %s due to %s" em (breachErrorToString otherError)
+
+          waitTos :: IO ()
+          waitTos = do _ <- putStrLn $ printf "waiting for %d seconds" (getSeconds delay)
+                       threadDelay $ (getMicro . secondsToMicro) delay
+
 
 newtype Seconds = Seconds { getSeconds :: Int } deriving Show
 
-newtype MicroSeconds = MicroSeconds { getMicro :: Int }
+newtype MicroSeconds = MicroSeconds { getMicro :: Int } deriving Show
 
 delay :: Seconds
 delay = Seconds 2
