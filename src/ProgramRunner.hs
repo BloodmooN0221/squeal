@@ -54,12 +54,18 @@ runBatchEmailLookup2 (email:rest) =
                            runBatchEmailLookup2 rest
             ) emailResultE
     where handleBreachError2 :: BreachErrorWithEmail -> IO String
-          handleBreachError2 (BreachErrorWithEmail (BreachApiError (ApiCallError (NotFound _))) (Email em)) = (putStrLn $ printf "No breaches for email: %s" em) >> waitTos >> (runBatchEmailLookup2 rest)
+          handleBreachError2 (BreachErrorWithEmail (BreachApiError (ApiCallError (NotFound _))) em) = emailNotFound em
           handleBreachError2 (BreachErrorWithEmail otherError (Email em)) = pure $ printf "error retrieving email: %s due to %s" em (breachErrorToString otherError)
 
           waitTos :: IO ()
           waitTos = do _ <- putStrLn $ printf "waiting for %d seconds" (getSeconds delay)
                        threadDelay $ (getMicro . secondsToMicro) delay
+
+          emailNotFound :: Email -> IO String
+          emailNotFound (Email em) =
+            do _ <- putStrLn $ printf "No breaches for email: %s" em
+               waitTos
+               runBatchEmailLookup2 rest
 
 
 newtype Seconds = Seconds { getSeconds :: Int } deriving Show
