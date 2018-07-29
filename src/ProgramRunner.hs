@@ -8,6 +8,7 @@ import ProgramArgs
 import Text.Printf (printf)
 import Data.List (intercalate)
 import Types
+import Time (MicroSeconds(..), Seconds(..), secondsToMicro)
 import Control.Exception (IOException, tryJust)
 import Control.Applicative (liftA)
 import Control.Concurrent (threadDelay)
@@ -46,37 +47,30 @@ runEmail email = do accountsE <- callBreachesService $ Breach email
 runBatchEmailLookup2 :: [Email] -> IO String
 runBatchEmailLookup2 [] = pure "done"
 runBatchEmailLookup2 (email:rest) =
-  do _ <- putStrLn $ printf "Looking up email: %s" (getEmail email)
+  do _ <- putStrLn $ lookingUpEmail email
      emailResultE <- runEmail email
-     either handleBreachError2
+     either (handleBreachError2 rest)
             (\result -> do _ <- putStrLn result
                            _ <- waitTos
                            runBatchEmailLookup2 rest
             ) emailResultE
-    where handleBreachError2 :: BreachErrorWithEmail -> IO String
-          handleBreachError2 (BreachErrorWithEmail (BreachApiError (ApiCallError (NotFound _))) em) = emailNotFound em
-          handleBreachError2 (BreachErrorWithEmail otherError (Email em)) = pure $ printf "error retrieving email: %s due to %s" em (breachErrorToString otherError)
 
-          waitTos :: IO ()
-          waitTos = do _ <- putStrLn $ printf "waiting for %d seconds" (getSeconds delay)
-                       threadDelay $ (getMicro . secondsToMicro) delay
+handleBreachError2 :: [Email] -> BreachErrorWithEmail -> IO String
+handleBreachError2 rest (BreachErrorWithEmail (BreachApiError (ApiCallError (NotFound _))) em) = emailNotFound
+  where emailNotFound :: IO String
+        emailNotFound =
+          do _ <- putStrLn $ noBreaches em
+             waitTos
+             runBatchEmailLookup2 rest
 
-          emailNotFound :: Email -> IO String
-          emailNotFound (Email em) =
-            do _ <- putStrLn $ printf "No breaches for email: %s" em
-               waitTos
-               runBatchEmailLookup2 rest
-
-
-newtype Seconds = Seconds { getSeconds :: Int } deriving Show
-
-newtype MicroSeconds = MicroSeconds { getMicro :: Int } deriving Show
+handleBreachError2 _ (BreachErrorWithEmail otherError (Email em)) = pure $ printf "error retrieving email: %s due to %s" em (breachErrorToString otherError)
 
 delay :: Seconds
 delay = Seconds 2
 
-secondsToMicro :: Seconds -> MicroSeconds
-secondsToMicro seconds = MicroSeconds $ (getSeconds seconds) * 1000000
+waitTos :: IO ()
+waitTos = do _ <- putStrLn $ waitingForDelay delay
+             threadDelay $ (getMicro . secondsToMicro) delay
 
 readEmailFromFile :: String -> IO (Either FileReadError [Email])
 readEmailFromFile fileName = do contentsE <- tryJust handleFileErrors (readFile fileName)

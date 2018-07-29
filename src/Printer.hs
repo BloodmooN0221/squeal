@@ -12,6 +12,7 @@ import Types (EndpointCallError(..))
 import Types (HttpError(..))
 import Types (PasswordHashError(..))
 import Types (name)
+import Time (Seconds(..))
 
 usage :: T.Text
 usage = T.pack "usage: squeal -e <email_address> | -p <password> | -ef <email_address_file>"
@@ -33,6 +34,15 @@ listBreaches (Email email) (BreachedAccounts xs) = printf "Breached Accounts for
 handleBreachErrors :: Email -> BreachError -> String
 handleBreachErrors email (BreachApiError (ApiCallError (NotFound _))) = listBreaches email (BreachedAccounts [])
 handleBreachErrors _ otherError = breachErrorToString otherError
+
+waitingForDelay :: Seconds -> String
+waitingForDelay (Seconds d) = printf "waiting for %d seconds" $ d
+
+lookingUpEmail :: Email -> String
+lookingUpEmail (Email em) = printf "Looking up email: %s" em
+
+noBreaches :: Email -> String
+noBreaches (Email em) = printf "No breaches for email: %s" em
 
 breachErrorToString :: BreachError -> String
 breachErrorToString (BreachApiError endpointCallError)  = printEndpointCallError "breaches" endpointCallError
