@@ -3,7 +3,7 @@ addons:
     packages:
     - libgmp-dev
 language: c
-sudo: false
+sudo: required
 cache:
   directories:
   - $HOME/.local/bin
