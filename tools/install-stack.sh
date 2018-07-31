@@ -6,11 +6,11 @@ then
 else
   echo "Installing Stack for $TRAVIS_OS_NAME..."
   URL="https://www.stackage.org/stack/$TRAVIS_OS_NAME-x86_64"
-  curl --location "$URL" > stack.tar.gz
-  tar -xvzf stack.tar.gz --strip-components 1
+  curl --location "$URL" > /tmp/stack.tar.gz
+  tar -xvzf /tmp/stack.tar.gz --strip-components 1
   mkdir -p "$HOME/.local/bin"
   mv stack "$HOME/.local/bin/"
-  rm stack.tar.gz
+  rm /tmp/stack.tar.gz
 fi
 
 stack --version
