@@ -10,8 +10,8 @@ else
     else
         ARCH="darwin"
     fi
-  echo "Installing ghr"
-  URL="https://github.com/tcnksm/ghr/releases/download/v0.10.2/ghr_v0.10.2_${ARCH}_386.zip"
+  echo "Installing ghr for ${ARCH}"
+  URL="https://github.com/tcnksm/ghr/releases/download/v0.10.2/ghr_v0.10.2_${ARCH}_386.tar.gz"
   curl -L ${URL} > ghr.zip
   mkdir -p "$HOME/bin"
   export PATH="$HOME/bin:$PATH"
