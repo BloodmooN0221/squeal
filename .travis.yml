@@ -10,7 +10,7 @@ cache:
   - $HOME/.stack
 os:
 - linux
-- osx
+# - osx
 before_install:
 - sh tools/install-stack.sh
 - sh tools/install-ghr.sh
