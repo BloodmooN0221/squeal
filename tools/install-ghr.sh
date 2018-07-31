@@ -11,10 +11,11 @@ else
         ARCH="darwin"
     fi
   echo "Installing ghr for ${ARCH}"
+  ARCHIVE='ghr.tar.gz'
   URL="https://github.com/tcnksm/ghr/releases/download/v0.10.2/ghr_v0.10.2_${ARCH}_386.tar.gz"
-  curl -L ${URL} > ghr.tar.gz
+  curl -L ${URL} > "${ARCHIVE}"
   mkdir -p "$HOME/bin"
   export PATH="$HOME/bin:$PATH"
-  tar -xvzf ghr.zip -d "$HOME/bin"
-  rm ghr.tar.gz
+  tar -xvzf "${ARCHIVE}" -d "$HOME/bin"
+  rm "${ARCHIVE}"
 fi
