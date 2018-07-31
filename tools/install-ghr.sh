@@ -16,6 +16,6 @@ else
   curl -L ${URL} > "${ARCHIVE}"
   mkdir -p "$HOME/bin"
   export PATH="$HOME/bin:$PATH"
-  tar -xvzf "${ARCHIVE}" -d "$HOME/bin"
+  tar -xvzf "${ARCHIVE}" -C "$HOME/bin"
   rm "${ARCHIVE}"
 fi
