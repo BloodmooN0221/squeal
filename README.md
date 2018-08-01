@@ -4,6 +4,7 @@ A Haskell command line wrapper around [haveibeenpwned](https://haveibeenpwned.co
 
 ![squeal](squeal.jpg)
 
+[![Build Status](https://travis-ci.org/ssanj/squeal.svg?branch=master)](https://travis-ci.org/ssanj/squeal)
 
 Latest version: [v0.1.0.1](https://github.com/ssanj/squeal/releases/tag/v0.1.0.1)
 
