@@ -13,6 +13,7 @@ else
   REPO="$(echo "$TRAVIS_REPO_SLUG" | cut -f2 -d/)"
   BIN="$(stack path --local-install-root)/bin/$REPO"
   BUNDLE_NAME="$REPO-$TRAVIS_TAG-$TRAVIS_OS_NAME.tar.gz"
+  echo "OWNER=${OWNER} REPO=${REPO} BIN=${BIN} BUNDLE_NAME=${BUNDLE_NAME}"
   cp "$BIN" "./$REPO"
   chmod +x "./$REPO"
   tar -czf "$BUNDLE_NAME" "$REPO"
