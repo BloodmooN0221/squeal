@@ -4,6 +4,9 @@ A Haskell command line wrapper around [haveibeenpwned](https://haveibeenpwned.co
 
 ![squeal](squeal.jpg)
 
+
+Latest version: [v0.1.0.1](https://github.com/ssanj/squeal/releases/tag/v0.1.0.1)
+
 ## Usage
 
 ```
@@ -44,17 +47,36 @@ which will return an output like:
 Password stolen: True
 ```
 
-## Building
-
-run `build`
-
 ## Installing
 
-run `build-install` to install squeal to ~/.local/bin.
+### Mac
+
+Install via [brew](https://brew.sh/):
+
+```
+brew tap ssanj/homebrew-squeal
+brew install squeal
+```
+
+Alternatively, download the [latest release](https://github.com/ssanj/squeal/releases/) from the releases page.
+
+### Linux
+
+Download the [latest release](https://github.com/ssanj/squeal/releases/) from releases page.
+
+
+## Building
+
+Build with:
+
+```build```
+
+Build and install (to ~/.local/bin) with:
+
+```build-install```
+
 
 ## Running (without installing)
-
-run:
 
 ```
 run -e <email_address> | -p <password>
