@@ -12,6 +12,8 @@ import Time (MicroSeconds(..), Seconds(..), secondsToMicro)
 import Control.Exception (IOException, tryJust)
 import Control.Applicative (liftA)
 import Control.Concurrent (threadDelay)
+import Paths_squeal (version)
+import Data.Version (showVersion)
 
 process :: [String] -> IO String
 process args = do let commands = getCommand args
@@ -25,6 +27,7 @@ handleErrors EmptyPassword               = pure $ printf "Empty password supplie
 handleErrors (InvalidEmailFile (FileReadError reason)) = pure $ printf "Could not read file:%s" reason
 
 runCommand :: Command -> IO String
+runCommand Version                           = pure $ showVersion version
 runCommand (LookUpBreachSites breach)        =
   do accountsE <- callBreachesService breach
      let (Breach email) = breach

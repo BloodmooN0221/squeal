@@ -6,7 +6,8 @@ import qualified Data.Text as T
 import Types
 import Hasher (sha1)
 
-data Command = LookUpBreachSites Breach
+data Command = Version
+             | LookUpBreachSites Breach
              | LookUpBreachesFromFile String
              | LookupPasswordHash PasswordHash deriving Show
 
@@ -21,6 +22,7 @@ data FileReadError = FileReadError String deriving Show
 
 getCommand :: [String] -> Either CommandError Command
 getCommand [] = Left NoCommandsSupplied
+getCommand ("-v": [])              = Right Version
 getCommand ("-e" : email : [])     =
   boolToEither (emailValidation email) InvalidEmail (LookUpBreachSites $ parseBreach email)
 getCommand ("-ef" : fileName : []) = Right $ LookUpBreachesFromFile fileName

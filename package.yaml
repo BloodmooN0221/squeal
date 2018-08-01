@@ -32,6 +32,7 @@ dependencies:
 
 library:
   source-dirs: src
+  other-modules: Paths_squeal
   ghc-options:
   - -Wall
   - -Wincomplete-uni-patterns
