@@ -17,5 +17,7 @@ else
   mkdir -p "$HOME/bin"
   export PATH="$HOME/bin:$PATH"
   tar -xvzf "${ARCHIVE}" -C "$HOME/bin"
+  echo "contents of ${HOME}/bin:"
+  ls -l "${HOME}/bin"
   rm "${ARCHIVE}"
 fi
