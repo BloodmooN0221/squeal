@@ -21,7 +21,7 @@ process args = do let commands = getCommand args
                   either handleErrors runCommand commands
 
 handleErrors :: CommandError -> IO String
-handleErrors NoCommandsSupplied          = pure $ printf "No commands supplied.\n%s" usage
+handleErrors NoCommandsSupplied          = pure $ printf "%s" usage
 handleErrors (UnknownCommand commands)   = pure $ printf "Unknown command supplied: %s\n%s" (intercalate " " commands) usage
 handleErrors InvalidEmail                = pure $ printf "Invalid email supplied.\n%s" usage
 handleErrors (InvalidEmailFile (FileReadError reason)) = pure $ printf "Could not read file:%s" reason
