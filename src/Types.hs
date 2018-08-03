@@ -2,6 +2,7 @@ module Types (BreachedAccounts(..),
               BreachedAccount(..),
               Breach(..),
               PasswordHash(..),
+              LookupPasswordHash(..),
               Hash(..),
               Email(..),
               HttpError(..),
@@ -27,9 +28,11 @@ data BreachedAccount =
 data BreachedAccounts =
   BreachedAccounts { accounts :: [BreachedAccount] } deriving Show
 
--- data Service = Breach Email | PasswordHash Hash
 data Breach = Breach Email deriving Show
+
 data PasswordHash = PasswordHash Hash deriving Show
+
+newtype LookupPasswordHash = LookupPasswordHash PasswordHash
 
 data Email = Email { getEmail :: T.Text } deriving Show
 

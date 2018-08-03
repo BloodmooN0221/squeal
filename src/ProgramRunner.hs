@@ -14,6 +14,7 @@ import Control.Applicative (liftA)
 import Control.Concurrent (threadDelay)
 import Paths_squeal (version)
 import Data.Version (showVersion)
+import Hasher (parsePasswordHash)
 
 process :: [String] -> IO String
 process args = do let commands = getCommand args
@@ -23,7 +24,6 @@ handleErrors :: CommandError -> IO String
 handleErrors NoCommandsSupplied          = pure $ printf "No commands supplied.\n%s" usage
 handleErrors (UnknownCommand commands)   = pure $ printf "Unknown command supplied: %s\n%s" (intercalate " " commands) usage
 handleErrors InvalidEmail                = pure $ printf "Invalid email supplied.\n%s" usage
-handleErrors EmptyPassword               = pure $ printf "Empty password supplied.\n%s" usage
 handleErrors (InvalidEmailFile (FileReadError reason)) = pure $ printf "Could not read file:%s" reason
 
 runCommand :: Command -> IO String
@@ -33,13 +33,20 @@ runCommand (LookUpBreachSites breach)        =
      let (Breach email) = breach
      pure $ either (handleBreachErrors email) (listBreaches email) accountsE
 
-runCommand (LookupPasswordHash passwordHash) =
-  do passResultE <- callPasswordHashService passwordHash
-     pure $ either handlePasswordHashErrors printPasswordHashStolen passResultE
+runCommand EnterPassword =
+  do _        <- putStrLn "please enter your password: "
+     password <- getLine
+     lookupPasswordHash (LookupPasswordHash $ parsePasswordHash password)
 
 runCommand (LookUpBreachesFromFile fileName) =
   do emailsE <- readEmailFromFile fileName
      either (pure . show) runBatchEmailLookup2 emailsE
+
+
+lookupPasswordHash :: LookupPasswordHash -> IO String
+lookupPasswordHash (LookupPasswordHash passwordHash) =
+  do passResultE <- callPasswordHashService passwordHash
+     pure $ either handlePasswordHashErrors printPasswordHashStolen passResultE
 
 runEmail :: Email -> IO (Either BreachErrorWithEmail String)
 runEmail email = do accountsE <- callBreachesService $ Breach email
