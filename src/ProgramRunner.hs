@@ -1,4 +1,4 @@
-module ProgramRunner (process) where
+module ProgramRunner (process, readPassword) where
 
 import qualified Data.Text as T
 import Data.Either (either)
@@ -15,6 +15,7 @@ import Control.Concurrent (threadDelay)
 import Paths_squeal (version)
 import Data.Version (showVersion)
 import Hasher (parsePasswordHash)
+import System.IO (hSetEcho, stdin)
 
 process :: [String] -> IO String
 process args = do let commands = getCommand args
@@ -35,13 +36,30 @@ runCommand (LookUpBreachSites breach)        =
 
 runCommand EnterPassword =
   do _        <- putStrLn "please enter your password: "
-     password <- getLine
+     password <- readPassword stars ""
+     _ <- putStrLn ""
      lookupPasswordHash (LookupPasswordHash $ parsePasswordHash password)
 
 runCommand (LookUpBreachesFromFile fileName) =
   do emailsE <- readEmailFromFile fileName
      either (pure . show) runBatchEmailLookup2 emailsE
 
+stars :: Char -> Char
+stars = \_ -> '*'
+
+getCh :: IO Char
+getCh =
+  do hSetEcho stdin False
+     x <- getChar
+     hSetEcho stdin True
+     return x
+
+readPassword :: (Char -> Char) -> String -> IO String
+readPassword f xs =
+  do c <- getCh
+     r <- if (c == '\n') then (pure xs)
+          else putChar (f c) >> (readPassword f (xs ++ [c]))
+     return r
 
 lookupPasswordHash :: LookupPasswordHash -> IO String
 lookupPasswordHash (LookupPasswordHash passwordHash) =
