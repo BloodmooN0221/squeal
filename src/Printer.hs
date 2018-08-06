@@ -78,7 +78,7 @@ usage = let descPadding = (optionMaxNamePadding options) <> betweenPadding
                               fd                                           <>
                               (descriptions descs)
                             ) <$> options
-            usageLine = "Usage: Squeal " <> (intercalate " | " (optionName <$> options))
+            usageLine = "Usage: squeal " <> (intercalate " | " (optionName <$> options))
             usageOutput = headerLine <> "\n" <> usageLine <> "\n" <> optionOutput
 
         in T.pack $ usageOutput

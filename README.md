@@ -11,7 +11,7 @@ Latest version: [v0.1.0.1](https://github.com/ssanj/squeal/releases/tag/v0.1.0.1
 ## Usage
 
 ```
-squeal -e <email_address> | -p <password> | -ef <email_address_file>
+squeal -v | -e  <email> | -ef <email_address_file> | -p
 ```
 
 To list breaches for an email address use:
@@ -39,7 +39,7 @@ To verify a password has not been pwned use:
 
 
 ```
-squeal -p your-password
+squeal -p
 ```
 
 which will return an output like:
@@ -65,6 +65,15 @@ Alternatively, download the [latest release](https://github.com/ssanj/squeal/rel
 
 Download the [latest release](https://github.com/ssanj/squeal/releases/) from releases page.
 
+## Upgrading
+
+### Mac
+
+Simply upgrade through *brew*:
+
+```
+brew upgrade --cleanup squeal
+```
 
 ## Building
 
@@ -80,5 +89,21 @@ Build and install (to ~/.local/bin) with:
 ## Running (without installing)
 
 ```
-run -e <email_address> | -p <password>
+run -v | -e  <email> | -ef <email_address_file> | -p
 ```
+
+## Releasing
+
+- Bump *version* in package.yaml: `X.Y.Z`
+- make changes
+- commit changes
+- tag changes to match version: `git tag 'vX.Y.Z'`
+- push commit
+- push tags: `git push --tags`
+
+### OSX
+
+- Grab SHA256 of *squeal-vX.Y.Z-osx.tar.gz* from [Travis](https://travis-ci.org/ssanj/squeal/builds)
+- Update [homebrew tap](https://github.com/ssanj/homebrew-squeal) with latest version and hash.
+- commit and push
+
