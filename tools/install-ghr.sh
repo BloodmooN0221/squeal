@@ -27,7 +27,5 @@ else
   else
       unzip -j "${ARCHIVE}" -d "${HOME}/bin/"
   fi
-  echo "contents of ${HOME}/bin:"
-  ls -l "${HOME}/bin"
   rm "${ARCHIVE}"
 fi
