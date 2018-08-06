@@ -15,7 +15,7 @@ import Control.Concurrent (threadDelay)
 import Paths_squeal (version)
 import Data.Version (showVersion)
 import Hasher (parsePasswordHash)
-import System.IO (hSetEcho, stdin, stdout, hSetBuffering, BufferMode(NoBuffering))
+import System.IO (getLine, hSetEcho, stdin, stdout, hSetBuffering, BufferMode(NoBuffering))
 
 process :: [String] -> IO String
 process args = do let commands = getCommand args
@@ -40,7 +40,12 @@ runCommand EnterPassword =
      _        <- putStrLn "please enter your password: "
      password <- readPassword stars ""
      _ <- putStrLn ""
-     lookupPasswordHash (LookupPasswordHash $ parsePasswordHash password)
+     result <- lookupPasswordHash (LookupPasswordHash $ parsePasswordHash password)
+     _ <- putStrLn result
+     _ <- putStrLn "press q quit or any other key to enter another password"
+     response <- getCh
+     if (response == 'q') then pure "" 
+     else (runCommand EnterPassword)
 
 runCommand (LookUpBreachesFromFile fileName) =
   do emailsE <- readEmailFromFile fileName
