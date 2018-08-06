@@ -6,7 +6,7 @@ A Haskell command line wrapper around [haveibeenpwned](https://haveibeenpwned.co
 
 [![Build Status](https://travis-ci.org/ssanj/squeal.svg?branch=master)](https://travis-ci.org/ssanj/squeal)
 
-Latest version: [v0.1.0.1](https://github.com/ssanj/squeal/releases/tag/v0.1.0.1)
+Latest version: [v0.1.0.9](https://github.com/ssanj/squeal/releases/tag/v0.1.0.9)
 
 ## Usage
 
@@ -100,6 +100,8 @@ run -v | -e  <email> | -ef <email_address_file> | -p
 - tag changes to match version: `git tag 'vX.Y.Z'`
 - push commit
 - push tags: `git push --tags`
+- update README (this file) with latest version link
+- push commit
 
 ### OSX
 
