@@ -15,7 +15,7 @@ import Control.Concurrent (threadDelay)
 import Paths_squeal (version)
 import Data.Version (showVersion)
 import Hasher (parsePasswordHash)
-import System.IO (hSetEcho, stdin)
+import System.IO (hSetEcho, stdin, stdout, hSetBuffering, BufferMode(NoBuffering))
 
 process :: [String] -> IO String
 process args = do let commands = getCommand args
@@ -35,7 +35,9 @@ runCommand (LookUpBreachSites breach)        =
      pure $ either (handleBreachErrors email) (listBreaches email) accountsE
 
 runCommand EnterPassword =
-  do _        <- putStrLn "please enter your password: "
+  do hSetBuffering stdin NoBuffering
+     hSetBuffering stdout NoBuffering
+     _        <- putStrLn "please enter your password: "
      password <- readPassword stars ""
      _ <- putStrLn ""
      lookupPasswordHash (LookupPasswordHash $ parsePasswordHash password)
