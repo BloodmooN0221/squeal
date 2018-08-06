@@ -15,7 +15,7 @@ import Control.Concurrent (threadDelay)
 import Paths_squeal (version)
 import Data.Version (showVersion)
 import Hasher (parsePasswordHash)
-import System.IO (getLine, hSetEcho, stdin, stdout, hSetBuffering, BufferMode(NoBuffering))
+import System.IO (hSetEcho, stdin, stdout, hSetBuffering, BufferMode(NoBuffering))
 
 process :: [String] -> IO String
 process args = do let commands = getCommand args
