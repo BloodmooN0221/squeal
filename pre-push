@@ -1,0 +1,2 @@
+#!/bin/bash
+stack build --ghc-options -O2 --pedantic

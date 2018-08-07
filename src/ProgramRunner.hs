@@ -9,7 +9,7 @@ import ProgramArgs
 import Text.Printf (printf)
 import Data.List (intercalate)
 import Types
-import Time (MilliSeconds(..), MicroSeconds(..), milliToMicro)
+import Time (MicroSeconds(..), milliToMicro)
 import HIBP (defaultDelay)
 import Control.Exception (IOException, tryJust)
 import Control.Applicative (liftA)
