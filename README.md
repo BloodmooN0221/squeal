@@ -97,7 +97,7 @@ Build and install (to ~/.local/bin) with:
 ## Running (without installing)
 
 ```
-run -v | -e  <email> | -ef <email_address_file> | -p
+run -v | -e  <email> | -ef <email_address_file> (apiDelay) | -p
 ```
 
 ## Releasing
