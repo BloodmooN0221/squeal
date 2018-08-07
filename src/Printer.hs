@@ -12,7 +12,7 @@ import Types (EndpointCallError(..))
 import Types (HttpError(..))
 import Types (PasswordHashError(..))
 import Types (name)
-import Time (Seconds(..))
+import Time (MilliSeconds(..))
 import Paths_squeal (version)
 import Data.Version (showVersion)
 
@@ -27,9 +27,12 @@ data Option = Option OptionName FirstDescription [Description]
 options :: [Option]
 options = [Option (OptionName "-v") (FirstDescription "Version information") [],
            Option (OptionName "-e  <email>") (FirstDescription "Verifies whether the supplied <email> address has been pwned") [],
-           Option (OptionName "-ef <email_address_file>") (FirstDescription "Verifies multiple email addresses, specified in the") [
-                                                           Description "<email_address_file> have been pwned.",
-                                                           Description "<email_address_file> should have one email address per line"],
+           Option (OptionName "-ef <email_address_file> (apiDelay)") (FirstDescription "Verifies multiple email addresses, specified in the") [
+                                                                        Description "<email_address_file> have been pwned.",
+                                                                        Description "<email_address_file> should have one email address per line",
+                                                                        Description "apiDelay is optional and can be any value over 1600ms",
+                                                                        Description "apiDelay defaults to 1600ms"
+                                                                      ],
            Option (OptionName "-p") (FirstDescription "Verifies whether a password has been stolen") []
           ]
 
@@ -104,8 +107,8 @@ handleBreachErrors :: Email -> BreachError -> String
 handleBreachErrors email (BreachApiError (ApiCallError (NotFound _))) = listBreaches email (BreachedAccounts [])
 handleBreachErrors _ otherError = breachErrorToString otherError
 
-waitingForDelay :: Seconds -> String
-waitingForDelay (Seconds d) = printf "waiting for %d seconds" $ d
+waitingForDelay :: MilliSeconds -> String
+waitingForDelay (MilliSeconds d) = printf "waiting for %d ms" $ d
 
 lookingUpEmail :: Email -> String
 lookingUpEmail (Email em) = printf "Looking up email: %s" em

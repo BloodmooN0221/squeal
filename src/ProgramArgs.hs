@@ -1,11 +1,14 @@
 module ProgramArgs (getCommand, CommandError(..), Command(..), FileReadError(..), emailTextValidation) where
 
 import qualified Data.Text as T
+import Data.Char (isDigit)
 import Types
+import Time (MilliSeconds(..))
+import HIBP (defaultDelay)
 
 data Command = Version
              | LookUpBreachSites Breach
-             | LookUpBreachesFromFile String
+             | LookUpBreachesFromFile String (Maybe BreachesApiDelay)
              | EnterPassword deriving Show
 
 data CommandError = NoCommandsSupplied
@@ -21,7 +24,18 @@ getCommand [] = Left NoCommandsSupplied
 getCommand ("-v": [])              = Right Version
 getCommand ("-e" : email : [])     =
   boolToEither (emailValidation email) InvalidEmail (LookUpBreachSites $ parseBreach email)
-getCommand ("-ef" : fileName : []) = Right $ LookUpBreachesFromFile fileName
+getCommand ("-ef" : fileName : []) = Right $ LookUpBreachesFromFile fileName Nothing
+getCommand ("-ef" : fileName : apiDelay : []) =
+  Right $ LookUpBreachesFromFile fileName (toApiDelay apiDelay)
+  where
+    toApiDelay :: String -> Maybe BreachesApiDelay
+    toApiDelay adelay =
+      if (all isDigit adelay) then
+        let value = (read adelay :: Int) in
+        if (value > (getMillis defaultDelay)) then (Just $ BreachesApiDelay $ MilliSeconds value)
+        else Nothing
+      else Nothing
+
 getCommand ("-p": [])  = Right $ EnterPassword
 getCommand other = Left $ UnknownCommand other
 

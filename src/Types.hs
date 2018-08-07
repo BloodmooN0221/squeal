@@ -8,6 +8,7 @@ module Types (BreachedAccounts(..),
               HttpError(..),
               BreachError(..),
               BreachErrorWithEmail(..),
+              BreachesApiDelay(..),
               PasswordHashError(..),
               EndpointCallError(..),
               Url(..),
@@ -21,6 +22,7 @@ import qualified Data.Text as T
 import qualified Data.ByteString as B
 import Data.Aeson
 import Data.Aeson.Types (typeMismatch)
+import Time (MilliSeconds(..))
 
 data BreachedAccount =
   BreachedAccount { name :: !T.Text } deriving Show
@@ -29,6 +31,8 @@ data BreachedAccounts =
   BreachedAccounts { accounts :: [BreachedAccount] } deriving Show
 
 data Breach = Breach Email deriving Show
+
+newtype BreachesApiDelay = BreachesApiDelay { delay :: MilliSeconds } deriving Show
 
 data PasswordHash = PasswordHash Hash deriving Show
 

@@ -11,7 +11,7 @@ Latest version: [v0.1.0.9](https://github.com/ssanj/squeal/releases/tag/v0.1.0.9
 ## Usage
 
 ```
-squeal -v | -e  <email> | -ef <email_address_file> | -p
+Usage: squeal -v | -e  <email> | -ef <email_address_file> (apiDelay) | -p
 ```
 
 To list breaches for an email address use:
@@ -33,6 +33,14 @@ To use a file with multiple emails (each on separate lines) use:
 
 ```
 squeal -ef your-email-file
+```
+
+> Requests to the breaches and pastes APIs are limited to one per every 1500 milliseconds.
+
+Because of this squeal defaults to sending breach requests every 1600ms. You can override this value by specifying another request delay. For example to use a 1800ms delay instead use:
+
+```
+squeal -ef your-email-file 1800
 ```
 
 To verify a password has not been pwned use:
